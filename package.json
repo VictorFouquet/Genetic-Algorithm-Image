@@ -1,6 +1,6 @@
 {
   "name": "image_ga",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Reproduces images using genetic algorithm",
   "main": "index.js",
   "scripts": {
