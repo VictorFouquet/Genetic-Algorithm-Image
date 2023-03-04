@@ -23,14 +23,6 @@ The generated image's pixels are then compared to the reference image's pixels.
 
 The population will try to minimize the number of mismatching pixels between generated images and the reference image.
 
-### Version 1.1 - Black quadrilateres on white background
-
-The reference image will be composed of a limited set of black convex quadrilateral shapes.
-
-The individuals will store a certain amount of shapes, each shape being represented as a set of four 2d points.
-
-The fitness function will once again try to minimize the number of mismatching pixels between generated images and the reference image.
-
 #### Current results
 
 The algorithm is used to solve a 100px * 100px random image.
@@ -43,14 +35,21 @@ Initial population's fittest individual (here displayed in pink):
 
 ![bestStart](/src/BinaryRectangleApp/out/0.png)
 
-Solution, reached at generation 85:
+Solution, reached at generation 95:
 
-![bestFinal](/src/BinaryRectangleApp/out/85.png)
+![bestFinal](/src/BinaryRectangleApp/out/95.png)
 
 Overall evolution statistics:
 
 ![stats](/src/BinaryRectangleApp/out/testchart.png)
 
+### Version 1.1 - Black quadrilateres on white background
+
+The reference image will be composed of a limited set of black convex quadrilateral shapes.
+
+The individuals will store a certain amount of shapes, each shape being represented as a set of four 2d points.
+
+The fitness function will once again try to minimize the number of mismatching pixels between generated images and the reference image.
 
 ### Version 2.0 - Colored rectangle on colored background
 
@@ -86,4 +85,5 @@ Prerequesites:
 Scripts:
 
 ```npm run compile``` to compile from TypeScript to ES6
+
 ```npm run binaryRectangle``` to run the Binary Rectangle problem (solutions will be written to ```./src/BinaryRectangleApp/out``` folder)
