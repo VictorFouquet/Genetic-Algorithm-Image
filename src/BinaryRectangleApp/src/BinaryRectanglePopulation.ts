@@ -47,7 +47,7 @@ export class BinaryRectanglePopulation extends Population<BinaryRectangleIndivid
         // Colors background in white
         canvasHandler.beginPath();
         canvasHandler.traceRectangle(0, 0, this.refImage.width, this.refImage.height);
-        canvasHandler.fill('white');
+        canvasHandler.fill('rgb(250, 250, 250)');
         // Traces and fills the individual's rectangle
         canvasHandler.beginPath();
         canvasHandler.traceRectangle(
