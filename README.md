@@ -31,6 +31,27 @@ The individuals will store a certain amount of shapes, each shape being represen
 
 The fitness function will once again try to minimize the number of mismatching pixels between generated images and the reference image.
 
+#### Current results
+
+The algorithm is used to solve a 100px * 100px random image.
+
+Generated reference image :
+
+![ref_image](/src/BinaryRectangleApp/out/binRef.png)
+
+Initial population's fittest individual (here displayed in pink):
+
+![bestStart](/src/BinaryRectangleApp/out/0.png)
+
+Solution, reached at generation 85:
+
+![bestFinal](/src/BinaryRectangleApp/out/85.png)
+
+Overall evolution statistics:
+
+![stats](/src/BinaryRectangleApp/out/testChart.png)
+
+
 ### Version 2.0 - Colored rectangle on colored background
 
 The reference image will be composed of a colored rectangle drawn on a colored background.
@@ -54,3 +75,15 @@ The final version of this project should be able to reproduce a real world image
 The individuals will be composed of genes storing colored convex quadrilateres, with colors using 3 components plus an alpha channel.
 
 We'll use once again the mean squared error approach to minimize the difference between the reference image and the generated images.
+
+## Development
+
+Prerequesites:
+
+- node
+- npm
+
+Scripts:
+
+```npm run compile``` to compile from TypeScript to ES6
+```npm run binaryRectangle``` to run the Binary Rectangle problem (solutions will be written to ```./src/BinaryRectangleApp/out``` folder)
