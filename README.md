@@ -49,7 +49,7 @@ Solution, reached at generation 85:
 
 Overall evolution statistics:
 
-![stats](/src/BinaryRectangleApp/out/testChart.png)
+![stats](/src/BinaryRectangleApp/out/testchart.png)
 
 
 ### Version 2.0 - Colored rectangle on colored background
