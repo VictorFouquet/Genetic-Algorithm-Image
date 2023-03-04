@@ -1,0 +1,153 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Population = void 0;
+/**
+ * Abstract class used to create, store and evolve individuals
+ */
+class Population {
+    /**
+     * Creates a new population
+     * @param individualCount Number of individuals in the population
+     * @param individualSize  Number of genes for each individual
+     * @param mutationRate    Probility for an individual to mutate
+     * @param IndividualClass Individual class
+     */
+    constructor(individualCount, individualSize, mutationRate, IndividualClass) {
+        this.individuals = [];
+        this.individualCount = individualCount;
+        this.individualSize = individualSize;
+        this.mutationRate = mutationRate;
+        this.averageFitness = 0;
+        this.generation = 0;
+        this.diversity = [];
+        this.IndividualClass = IndividualClass;
+    }
+    /**
+     * Randomly creates the population's first generation
+     * @returns array of individuals
+     */
+    spawn() {
+        for (let i = 0; i < this.individualCount; i++) {
+            const individual = new this.IndividualClass(this.individualSize);
+            individual.random();
+            this.individuals[i] = individual;
+        }
+        return this.individuals;
+    }
+    /**
+     * Picks an individual from population according to the individuals probability
+     * @returns picked individual
+     */
+    pick() {
+        let random = Math.random();
+        for (let j = 0; j < this.individualCount; j++) {
+            if (this.individuals[j].probability > random) {
+                return this.individuals[j];
+            }
+        }
+    }
+    /**
+     * Selects individuals for mating according to their fitness
+     * @param count number of couples to select
+     * @returns array of paired individuals
+     */
+    select(count) {
+        const selected = [];
+        // Computes sum of all individuals' fitness
+        const fitnessSum = this.individuals.reduce((acc, curr) => acc + curr.fitness, 0);
+        // Computes inverse proportions for each individual
+        this.individuals.forEach(individual => {
+            individual.probability = fitnessSum / (individual.fitness === 0 ? 1e-6 : individual.fitness);
+        });
+        // Computes sum of all individuals' probability
+        const propabilitySum = this.individuals.reduce((acc, curr) => acc + curr.probability, 0);
+        // Normalizes probabilities
+        this.individuals.forEach(individual => {
+            individual.probability /= propabilitySum;
+        });
+        // Computes cumulative probabilities
+        let cumulativeProbability = 0;
+        this.individuals.forEach(individual => {
+            cumulativeProbability += individual.probability;
+            individual.probability = cumulativeProbability;
+        });
+        // Initializes parents for mating
+        let parent1, parent2;
+        // Applies random biased selection wheel
+        for (let i = 0; i < count; i++) {
+            let safe = 0;
+            parent1 = this.pick();
+            parent2 = parent1;
+            while (parent1 === parent2 && safe < 1000) {
+                safe++;
+                parent2 = this.pick();
+            }
+            selected.push([parent1, parent2]);
+        }
+        return selected;
+    }
+    /**
+     * Crosses over individual to create new offspring
+     * @returns individuals after crossing over
+     */
+    crossover() {
+        const offspring = [];
+        // Two mates will create two individual so we need a selection
+        // that is half the length of the population
+        const parents = this.select(Math.ceil(this.individualCount / 2));
+        for (let i = 0; i < parents.length; i++) {
+            const child1 = new this.IndividualClass(this.individualSize);
+            const child2 = new this.IndividualClass(this.individualSize);
+            const [parent1, parent2] = parents[i];
+            // Sets offspring genes
+            [child1.genes, child2.genes] = parent1.crossover(parent2);
+            offspring.push(child1, child2);
+        }
+        return offspring;
+    }
+    /**
+     * Computes the number of unique individual for one generation
+     */
+    getDiversity() {
+        const diversity = {};
+        // Initializes current diversity to zero
+        this.diversity[this.generation] = 0;
+        // Increments diversity for every individual whose genotype doesnt appear
+        // in this generation diversity object
+        for (let i = 0; i < this.individuals.length; i++) {
+            const individal = this.individuals[i];
+            if (!diversity[individal.genes.join(',')]) {
+                diversity[individal.genes.join(',')] = 1;
+                this.diversity[this.generation]++;
+            }
+        }
+    }
+    /**
+     * Wrapper function that creates a new generation
+     * @returns all individuals from population
+     */
+    generate() {
+        // Computes individuals' fitness
+        this.evaluate();
+        // Stops evolution if a solution has been found
+        if (this.solution !== undefined)
+            return this.individuals;
+        // Creates offspring and add them to the population
+        const offspring = this.crossover();
+        this.individuals.push(...offspring);
+        // Evaluates population including offspring
+        this.evaluate();
+        // Remove less fit individuals
+        this.cull();
+        // Mutate survivors
+        this.mutate();
+        this.evaluate();
+        // Stores current average fitness and diversity
+        this.averageFitnesses.push(this.averageFitness);
+        this.getDiversity();
+        // Increments generation count
+        this.generation++;
+        return this.individuals;
+    }
+}
+exports.Population = Population;
