@@ -38,7 +38,7 @@ class BinaryRectanglePopulation extends GA_1.Population {
         // Colors background in white
         canvasHandler.beginPath();
         canvasHandler.traceRectangle(0, 0, this.refImage.width, this.refImage.height);
-        canvasHandler.fill('white');
+        canvasHandler.fill('rgb(250, 250, 250)');
         // Traces and fills the individual's rectangle
         canvasHandler.beginPath();
         canvasHandler.traceRectangle(individual.genes[0], individual.genes[1], individual.genes[2], individual.genes[3]);

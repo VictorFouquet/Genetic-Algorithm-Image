@@ -34,7 +34,7 @@ class BinaryRectangleSolver {
         // Draws background
         this.refHandler.beginPath();
         this.refHandler.traceRectangle(0, 0, this.refCanvasWidth, this.refCanvasHeight);
-        this.refHandler.fill('white');
+        this.refHandler.fill('rgb(250, 250, 250)');
         // Creates random black rectangle
         const xValues = [
             Math.round(Math.random() * this.refCanvasWidth),
@@ -98,7 +98,7 @@ class BinaryRectangleSolver {
         // Draws best individual's rectangle
         canvasHandler.beginPath();
         canvasHandler.traceRectangle(0, 0, canvas.width, canvas.height);
-        canvasHandler.fill('white');
+        canvasHandler.fill('rgb(250, 250, 250)');
         canvasHandler.beginPath();
         canvasHandler.traceRectangle(best.genes[0], best.genes[1], best.genes[2], best.genes[3]);
         canvasHandler.fill('hsla(0, 100%, 50%, 0.5)');
