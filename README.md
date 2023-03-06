@@ -45,11 +45,39 @@ Overall evolution statistics:
 
 ### Version 1.1 - Black quadrilateres on white background
 
-The reference image will be composed of a limited set of black convex quadrilateral shapes.
+The reference image will be composed of a limited set of black convex quadrilateral shapes (2 / 4 / 8 in the examples).
 
-The individuals will store a certain amount of shapes, each shape being represented as a set of four 2d points.
+The individuals will store a certain amount of shapes (100 shapes in the example), each shape being a convex cyclic quadrilatere, represented as a set of four 2d points.
 
 The fitness function will once again try to minimize the number of mismatching pixels between generated images and the reference image.
+
+#### Current results
+
+The algorithm is still used to solve a 100px * 100px random image.
+
+##### Two shapes in the reference image:
+
+Reference Image | 1st generation | 1000th generation
+:--------------:|:--------------:|:------------------:
+![ref_image](/src/BinaryQuadsApp/out/quads2/binRef.png) | ![ref_image](/src/BinaryQuadsApp/out/quads2/0.png) | ![ref_image](/src/BinaryQuadsApp/out/quads2/1000.png)
+
+![stats](/src/BinaryQuadsApp/out/quads2/testchart.png)
+
+##### Four shapes in the reference image:
+
+Reference Image | 1st generation | 1000th generation
+:--------------:|:--------------:|:------------------:
+![ref_image](/src/BinaryQuadsApp/out/quads4/binRef.png) | ![ref_image](/src/BinaryQuadsApp/out/quads4/0.png) | ![ref_image](/src/BinaryQuadsApp/out/quads4/1000.png)
+
+![stats](/src/BinaryQuadsApp/out/quads4/testchart.png)
+
+##### Eight shapes in the reference image:
+
+Reference Image | 1st generation | 1000th generation
+:--------------:|:--------------:|:------------------:
+![ref_image](/src/BinaryQuadsApp/out/quads8/binRef.png) | ![ref_image](/src/BinaryQuadsApp/out/quads8/0.png) | ![ref_image](/src/BinaryQuadsApp/out/quads8/1000.png)
+
+![stats](/src/BinaryQuadsApp/out/quads8/testchart.png)
 
 ### Version 2.0 - Colored rectangle on colored background
 
@@ -84,6 +112,8 @@ Prerequesites:
 
 Scripts:
 
-```npm run compile``` to compile from TypeScript to ES6
+- ```npm run compile``` to compile from TypeScript to ES6
 
-```npm run binaryRectangle``` to run the Binary Rectangle problem (solutions will be written to ```./src/BinaryRectangleApp/out``` folder)
+- ```npm run binaryRectangle``` to run the Binary Rectangle problem (solutions will be written to ```./src/BinaryRectangleApp/out``` folder)
+
+- ```npm run binaryQuads``` to run the Binary Quads problem (solutions will be written to ```./src/BinaryQuadsApp/out``` folder)
