@@ -6,7 +6,6 @@ import { BinaryQuadsIndividual } from "./BinaryQuadsIndividual";
 import { _ImageData } from "../../Canvas/interfaces/ImageData.interface";
 import { NodeCanvasHandler } from "../../Canvas/NodeCanvasHandler";
 import { Circle, CyclicQuad, Point, Points4 } from "../../Geometry";
-import { Vector2 } from "../../LinearAlgebra";
 
 /**
  * Population representing solutions to the Binary Quads Problem
