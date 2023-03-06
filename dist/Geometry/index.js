@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Shape = exports.Quad = exports.Polygon = exports.Point = exports.CyclicQuad = exports.Circle = void 0;
+var Circle_1 = require("./src/Circle");
+Object.defineProperty(exports, "Circle", { enumerable: true, get: function () { return Circle_1.Circle; } });
+var CyclicQuad_1 = require("./src/CyclicQuad");
+Object.defineProperty(exports, "CyclicQuad", { enumerable: true, get: function () { return CyclicQuad_1.CyclicQuad; } });
+var Point_1 = require("./src/Point");
+Object.defineProperty(exports, "Point", { enumerable: true, get: function () { return Point_1.Point; } });
+var Polygon_1 = require("./src/Polygon");
+Object.defineProperty(exports, "Polygon", { enumerable: true, get: function () { return Polygon_1.Polygon; } });
+var Quad_1 = require("./src/Quad");
+Object.defineProperty(exports, "Quad", { enumerable: true, get: function () { return Quad_1.Quad; } });
+var Shape_1 = require("./src/Shape");
+Object.defineProperty(exports, "Shape", { enumerable: true, get: function () { return Shape_1.Shape; } });
