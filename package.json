@@ -1,13 +1,12 @@
 {
   "name": "image_ga",
-  "version": "1.1.0",
+  "version": "2.0",
   "description": "Reproduces images using genetic algorithm",
   "main": "index.js",
   "scripts": {
     "test": "jest",
     "compile": "rm -rf ./dist && tsc",
-    "binaryRectangle": "node dist/BinaryRectangleApp/index.BinaryRectangle.js",
-    "binaryQuads":     "node dist/BinaryQuadsApp/index.BinaryQuads.js"
+    "geneticImage": "node dist/GeneticImageApp/index.GeneticImage.js"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +15,8 @@
     "@types/canvasjs": "^1.9.8",
     "canvas": "^2.11.0",
     "chart.js": "^3.9.1",
-    "chartjs-node-canvas": "^4.1.6"
+    "chartjs-node-canvas": "^4.1.6",
+    "node-memwatch-new": "^0.0.1"
   },
   "devDependencies": {
     "@types/jest": "^29.4.0",
