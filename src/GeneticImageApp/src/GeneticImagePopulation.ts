@@ -27,9 +27,9 @@ export class GeneticImagePopulation extends Population<GeneticImageIndividual> {
      * @param mutationRate population's mutation rate
      */
     constructor(individualCount: number, refImage: _ImageData, mutationRate: number,
-        background: Image, strokes: Image[]
+        background: Image, strokes: Image[], indivSize: number
     ) {
-        super(individualCount, 150, mutationRate, GeneticImageIndividual);
+        super(individualCount, indivSize, mutationRate, GeneticImageIndividual);
         // Sets Genetic Image Individuals reference image width and height
         GeneticImageIndividual.imageWidth  = refImage.width;
         GeneticImageIndividual.imageHeight = refImage.height;

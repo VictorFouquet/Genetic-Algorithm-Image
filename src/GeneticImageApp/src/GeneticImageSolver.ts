@@ -12,6 +12,7 @@ import { RandomColoredCyclicQuad } from "./RandomColorCyclicQuad";
 /** Binary quad solver main class */
 export class GeneticImageSolver {
     populationSize:  number;  // Number of individuals in population
+    individualSize:  number;  // Number of genes in each individual
     maxGeneration:   number;  // Max number of generations before stopping evolution
     mutationRate:    number;  // Population's muation rate
     steps:           number;  // Number of steps for generating final image
@@ -31,23 +32,19 @@ export class GeneticImageSolver {
      * @param canvasHeight reference image height
      * @param out output folder to write images
      */
-    constructor(
-        popSize:     number, maxGen:       number, mutRate: number, steps: number,
-        canvasWidth: number, canvasHeight: number, out:     string
-    ) {
+    constructor(popSize: number, indivSize: number, maxGen: number, mutRate: number, steps: number, out: string) {
         this.populationSize  = popSize;
+        this.individualSize  = indivSize;
         this.maxGeneration   = maxGen;
         this.mutationRate    = mutRate;
-        this.steps           = steps
-        this.refCanvasWidth  = canvasWidth;
-        this.refCanvasHeight = canvasHeight;
+        this.steps           = steps;
         this.outputFolder    = out;
     }
 
     /** Creates the canvas background image */
     async createBackgroundCanvas(): Promise<void> {
         // Loads reference image
-        const ref: Image = await loadImage(path.join(this.outputFolder, "previous", "ref.png"));
+        const ref: Image = await loadImage(path.join(this.outputFolder, "ref.png"));
         this.refCanvasWidth = ref.width;
         this.refCanvasHeight = ref.height;
         // Converts reference image to canvas
@@ -57,8 +54,8 @@ export class GeneticImageSolver {
 
         let lattestResult: Image;
         // Checks if a previous evolved image can be found, else a white background is created.
-        if (fs.existsSync(path.join(this.outputFolder, "previous", "lattestResult.png"))) {
-            lattestResult = await loadImage(path.join(this.outputFolder, "previous", "lattestResult.png"))
+        if (fs.existsSync(path.join(this.outputFolder, "results", "lattestResult.png"))) {
+            lattestResult = await loadImage(path.join(this.outputFolder, "results", "lattestResult.png"))
         } else {
             // Creates white canvas background
             let bgCanvas: Canvas = createCanvas(this.refCanvasWidth, this.refCanvasHeight);
@@ -68,8 +65,8 @@ export class GeneticImageSolver {
             bgHandler.fill("white");
             // Stores the white background in file system as the lattest result
             const buffer: Buffer = bgCanvas.toBuffer("image/png");
-            fs.writeFileSync(path.join(this.outputFolder, "previous", "lattestResult.png"), buffer);
-            lattestResult = await loadImage(path.join(this.outputFolder, "previous", "lattestResult.png"));
+            fs.writeFileSync(path.join(this.outputFolder, "results", "lattestResult.png"), buffer);
+            lattestResult = await loadImage(path.join(this.outputFolder, "results", "lattestResult.png"));
         }
 
         this.background = lattestResult;
@@ -159,14 +156,15 @@ export class GeneticImageSolver {
 
         this.createBackgroundCanvas().then(async () => {
             // Scalar used to modify the size of the quads
-            let sizeCoef: number = 0.5;
+            let initCoef: number = 1;
             for (let step = 0; step < this.steps; step++) {
+                let sizeCoef: number = initCoef / (step * 2);
                 // Time tracker for one image step
                 let drawStart = Date.now();
                 await this.createStrokeImages(sizeCoef);
                 // Loads background
                 this.background = await loadImage(path.join(
-                    this.outputFolder, "previous", "lattestResult.png"
+                    this.outputFolder, "results", "lattestResult.png"
                 ));
 
                 // Creates a new population
@@ -175,27 +173,29 @@ export class GeneticImageSolver {
                     this.refHandler.getImageData(0, 0, this.refCanvasWidth, this.refCanvasHeight),
                     this.mutationRate,
                     this.background,
-                    this.strokes
+                    this.strokes,
+                    this.individualSize
                 );
                 
                 // Spawns first generation
                 population.spawn()
                 this.evolveStepGenerations(population);
                 fs.renameSync(
-                    path.join(this.outputFolder, "previous", "lattestResult.png"),
-                    path.join(this.outputFolder, "previous", `lattestResult${step}.png`)
+                    path.join(this.outputFolder, "results", "lattestResult.png"),
+                    path.join(this.outputFolder, "results", `lattestResult${step}.png`)
                 )
                 fs.renameSync(
                     path.join(this.outputFolder, `${this.maxGeneration}.png`),
-                    path.join(this.outputFolder, "previous", "lattestResult.png")
+                    path.join(this.outputFolder, "results", "lattestResult.png")
                 )
-                if (sizeCoef >= 0.2)
-                    sizeCoef *= 0.5
-                else if (sizeCoef >= 0.01)
-                    sizeCoef -= 0.005
-                else sizeCoef *= 0.8
 
-                path.join(this.outputFolder, "previous", "best.png")
+                // if (sizeCoef >= 0.2)
+                //     sizeCoef *= 0.5
+                // else if (sizeCoef >= 0.01)
+                //     sizeCoef -= 0.005
+                // else sizeCoef *= 0.8
+
+                path.join(this.outputFolder, "results", "best.png")
                 console.log('TOTAL GENERATION: ', (Date.now() - drawStart) * 0.001)
             }
             console.log('FINAL: ', (Date.now() - mainStart) * 0.001)
