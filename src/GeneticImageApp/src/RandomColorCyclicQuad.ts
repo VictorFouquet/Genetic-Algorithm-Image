@@ -20,7 +20,7 @@ export class RandomColoredCyclicQuad {
                 Math.random() * maxX,
                 Math.random() * maxY
             ),
-            Math.random() * maxR
+            maxR
         )
         // Computes 4 points that lay on the circle to create a cyclic quad
         this.points = new CyclicQuad(refCircle).points;
