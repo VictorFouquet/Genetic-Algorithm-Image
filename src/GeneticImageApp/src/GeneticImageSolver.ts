@@ -54,8 +54,8 @@ export class GeneticImageSolver {
 
         let lattestResult: Image;
         // Checks if a previous evolved image can be found, else a white background is created.
-        if (fs.existsSync(path.join(this.outputFolder, "results", "lattestResult.png"))) {
-            lattestResult = await loadImage(path.join(this.outputFolder, "results", "lattestResult.png"))
+        if (fs.existsSync(path.join(this.outputFolder, "results", "result.png"))) {
+            lattestResult = await loadImage(path.join(this.outputFolder, "results", "result.png"))
         } else {
             // Creates white canvas background
             let bgCanvas: Canvas = createCanvas(this.refCanvasWidth, this.refCanvasHeight);
@@ -65,8 +65,8 @@ export class GeneticImageSolver {
             bgHandler.fill("white");
             // Stores the white background in file system as the lattest result
             const buffer: Buffer = bgCanvas.toBuffer("image/png");
-            fs.writeFileSync(path.join(this.outputFolder, "results", "lattestResult.png"), buffer);
-            lattestResult = await loadImage(path.join(this.outputFolder, "results", "lattestResult.png"));
+            fs.writeFileSync(path.join(this.outputFolder, "results", "result.png"), buffer);
+            lattestResult = await loadImage(path.join(this.outputFolder, "results", "result.png"));
         }
 
         this.background = lattestResult;
@@ -89,7 +89,7 @@ export class GeneticImageSolver {
 
         // Writes the image to file system
         const buffer: Buffer = canvas.toBuffer("image/png");
-        fs.writeFileSync(`${this.outputFolder}/${gen}.png`, buffer);
+        fs.writeFileSync(path.join(this.outputFolder, 'step', `${gen}.png`), buffer);
     }
 
     /**
@@ -157,14 +157,14 @@ export class GeneticImageSolver {
         this.createBackgroundCanvas().then(async () => {
             // Scalar used to modify the size of the quads
             let initCoef: number = 1;
-            for (let step = 0; step < this.steps; step++) {
+            for (let step = 1; step <= this.steps; step++) {
                 let sizeCoef: number = initCoef / (step * 2);
                 // Time tracker for one image step
                 let drawStart = Date.now();
                 await this.createStrokeImages(sizeCoef);
                 // Loads background
                 this.background = await loadImage(path.join(
-                    this.outputFolder, "results", "lattestResult.png"
+                    this.outputFolder, "results", "result.png"
                 ));
 
                 // Creates a new population
@@ -181,24 +181,19 @@ export class GeneticImageSolver {
                 population.spawn()
                 this.evolveStepGenerations(population);
                 fs.renameSync(
-                    path.join(this.outputFolder, "results", "lattestResult.png"),
-                    path.join(this.outputFolder, "results", `lattestResult${step}.png`)
+                    path.join(this.outputFolder, "results", "result.png"),
+                    path.join(this.outputFolder, "results", `result${step}.png`)
                 )
                 fs.renameSync(
-                    path.join(this.outputFolder, `${this.maxGeneration}.png`),
-                    path.join(this.outputFolder, "results", "lattestResult.png")
+                    path.join(this.outputFolder, 'step', `${this.maxGeneration}.png`),
+                    path.join(this.outputFolder, "results", "result.png")
                 )
 
-                // if (sizeCoef >= 0.2)
-                //     sizeCoef *= 0.5
-                // else if (sizeCoef >= 0.01)
-                //     sizeCoef -= 0.005
-                // else sizeCoef *= 0.8
-
-                path.join(this.outputFolder, "results", "best.png")
                 console.log('TOTAL GENERATION: ', (Date.now() - drawStart) * 0.001)
             }
-            console.log('FINAL: ', (Date.now() - mainStart) * 0.001)
+            console.log('FINAL: ', (Date.now() - mainStart) * 0.001);
+            fs.rmSync(path.join(this.outputFolder, 'step'), { recursive: true, force: true });
+            fs.rmSync(path.join(this.outputFolder, 'strokes'), { recursive: true, force: true });
         })
     }
 }

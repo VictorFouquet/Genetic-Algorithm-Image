@@ -10,6 +10,10 @@ function main() {
     const config = JSON.parse(
         fs.readFileSync(path.join(process.cwd(), 'app.config.json')).toString()
     );
+    fs.mkdirSync(path.join(process.cwd(), ...config.output, 'step'));
+    fs.mkdirSync(path.join(process.cwd(), ...config.output, 'results'));
+    fs.mkdirSync(path.join(process.cwd(), ...config.output, 'strokes'));
+
     const app: GeneticImageSolver = new GeneticImageSolver(
         config.populationSize,
         config.individualSize,
