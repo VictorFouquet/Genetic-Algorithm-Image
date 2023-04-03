@@ -1,119 +1,157 @@
 # Genetic Algorithm Image
 
-Using genetic algorithm in order to reproduce a reference image.
+## Overview
 
-## Roadmap
+This project uses genetic algorithm, evolving an image to reproduce another reference image.
 
-### Version 1.0 - Black rectangle on white background
+After starting with a simplified version, reproducing binary images composed of black shapes on white background to make sure the population actually improved and converged, I've been able to switch to this more complex version, using
+real world pictures and illustrations.
 
-Beginning simple, the first version of the algorithm should be able to reproduce a really basic image, composed of a black rectangle with a random width and height, placed at a random position on a white background.
+The algorithm uses Canvas API to draw random colored shapes on a starting white background, and iteratively tries to reduce the difference between its generated pictures and the reference picture it's been given to reproduce.
 
-The population is composed of individuals whose genes are composed of 4 numbers:
+## Algorithm Details
 
-- x position of the rectangle's upper left corner
-- y position of the rectangle's upper left corner
-- width of the rectangle
-- height of the rectangle
+### Genes
 
-No geometry concept is involved in the searching process.
+Each gene is a **random colored cyclic quad**, representing a **stroke**.
 
-The fitness function computes the phenotype of each individual (being the generated black rectangle on white background).
+For performance reasons, each stroke is drawn on a separate canvas and stored in the file system, then used as a PNG image to be drawn on the generated image's canvas.
 
-The generated image's pixels are then compared to the reference image's pixels.
+Strokes are **random colored cyclic quads** : we place a circle's center on a random $(x,y)$ position inside the canvas' limits, then 4 points are randomly placed on the circle's edge, and finally a random color is assigned to the shape.
 
-The population will try to minimize the number of mismatching pixels between generated images and the reference image.
+### Individuals
 
-#### Current results
+Individuals represent an evolving picture, trying to reproduce the reference picture.
 
-The algorithm is used to solve a 100px * 100px random image.
+Each individual is composed as a list of **stroke indice** that will be drawn when converting the individual **genotype** to its canvas **phenotype**.
 
-Generated reference image :
+When mutation occur, we simply replace the mutating gene by another index taken randomly from the stroke indice list.
 
-![ref_image](/src/BinaryRectangleApp/out/binRef.png)
+### Population
 
-Initial population's fittest individual (here displayed in pink):
+#### Fitness function
 
-![bestStart](/src/BinaryRectangleApp/out/0.png)
+We simply use the **sum of squared errors** to compute the individuals fitnesses :
 
-Solution, reached at generation 95:
+$$
+J = \sum_{i=1}^n{(\vec{y_i}-\vec{x_i})^2}
+$$
 
-![bestFinal](/src/BinaryRectangleApp/out/95.png)
+Where $\vec{x}$ is the generated RGB color for a given pixel and $\vec{y}$ the actual RGB color for the same pixel in the reference image.
 
-Overall evolution statistics:
+#### Selection
 
-![stats](/src/BinaryRectangleApp/out/testchart.png)
+We use **roulette wheel selection** to pick the individuals that will be used for mating, with a probability of being picked proportionnal to their respective fitness.
 
-### Version 1.1 - Black quadrilateres on white background
+#### Cross Over
 
-The reference image will be composed of a limited set of black convex quadrilateral shapes (2 / 4 / 8 in the examples).
+After choosing two individuals for mating, we create their offspring by randomly picking a **pivot** index.
 
-The individuals will store a certain amount of shapes (100 shapes in the example), each shape being a convex cyclic quadrilatere, represented as a set of four 2d points.
+- Child $A$ gets genes $[0..p[$ from parent $A$ and $[p..n]$ from parent $B$
+- Child $B$ gets genes $[0..p[$ from parent $B$ and $[p..n]$ from parent $A$
 
-The fitness function will once again try to minimize the number of mismatching pixels between generated images and the reference image.
+#### Culling
 
-#### Current results
+We evaluate the offsprings fitnesses, then we place parents and offspring in an array, sorted according to the individuals fitnesses.
 
-The algorithm is still used to solve a 100px * 100px random image.
+We only keep the $n$ best individuals to make the population size constant, and ensure no regression can occur with elitism, achieved by the overall sorting operation.
 
-##### Two shapes in the reference image:
+### Working by steps
 
-Reference Image | 1st generation | 1000th generation
-:--------------:|:--------------:|:------------------:
-![ref_image](/src/BinaryQuadsApp/out/quads2/binRef.png) | ![ref_image](/src/BinaryQuadsApp/out/quads2/0.png) | ![ref_image](/src/BinaryQuadsApp/out/quads2/1000.png)
+Like in a real world painting, we'll proceed by **steps** to reproduce the reference image.
 
-![stats](/src/BinaryQuadsApp/out/quads2/testchart.png)
+Up to now in this project state, a step is defined by a number of generations to evolve for one population, and a size for the circles defining the strokes.
 
-##### Four shapes in the reference image:
+Further we go in time, smaller are the strokes, to mimic the action of going from blocking large shapes on a canvas, and going more and more precisely to the details.
 
-Reference Image | 1st generation | 1000th generation
-:--------------:|:--------------:|:------------------:
-![ref_image](/src/BinaryQuadsApp/out/quads4/binRef.png) | ![ref_image](/src/BinaryQuadsApp/out/quads4/0.png) | ![ref_image](/src/BinaryQuadsApp/out/quads4/1000.png)
+The result of each step is stored in file system, and **used as the background for the next step**.
 
-![stats](/src/BinaryQuadsApp/out/quads4/testchart.png)
+## Current results
 
-##### Eight shapes in the reference image:
+### Black and white picture
 
-Reference Image | 1st generation | 1000th generation
-:--------------:|:--------------:|:------------------:
-![ref_image](/src/BinaryQuadsApp/out/quads8/binRef.png) | ![ref_image](/src/BinaryQuadsApp/out/quads8/0.png) | ![ref_image](/src/BinaryQuadsApp/out/quads8/1000.png)
+Reference Image | Evolution | 
+:--------------:|:--------------:|
+![black_and_white_ref](examples/black_and_white_ref.png) | ![black_and_white](examples/black_and_white.gif)
 
-![stats](/src/BinaryQuadsApp/out/quads8/testchart.png)
+### Rasterized image (using pixel art)
 
-### Version 2.0 - Colored rectangle on colored background
+Reference Image | Evolution | 
+:--------------:|:--------------:|
+![mario_ref](examples/mario_ref.png) | ![black_and_white](examples/mario.gif)
 
-The reference image will be composed of a colored rectangle drawn on a colored background.
+### Old Masters paintings
 
-The individual will store the same variables as in the 1.0 version, with 6 more variables to encode the two colors that are to be guessed (color space is still to be chosen, either RGB or HSL)
+Reference Image | Evolution | 
+:--------------:|:--------------:|
+![rembrandt_ref](examples/rembrandt_ref.png) | ![rembrandt](examples/rembrandt.gif)
 
-The fitness function will try to minimize the difference between the reference and generated images, using a mean squared errors function to compute the score of each individual.
+Reference Image | Evolution | 
+:--------------:|:--------------:|
+![vermeer_ref](examples/vermeer_ref.png) | ![vermeer](examples/vermeer.gif)
 
-### Version 2.1 - Colored quadrilateres on colored background
+## Review
 
-As in 1.1 version, several quadrilateral shapes will be rendered on the image, the difference being that the shapes and background will be colored.
+### Resemblance results
 
-Individuals' genes will still be composed of shapes represented by four 2d points, but 3 variables will be added to store the color of each shape.
+#### Composition
 
-Mean squared errors will be used by the fitness function in order to minimize the differences between reference image and and the generated images.
+**Shapes** are accurate, but the algorithm struggles to refine the **details**.
 
-### Version 3 - Real world image
+##### Possible improvements :
 
-The final version of this project should be able to reproduce a real world image, being a photography, a painting, or any illustration.
+- Use an edge detection algorithm after a certain number of steps have been reached, to concentrate the little strokes on edges
 
-The individuals will be composed of genes storing colored convex quadrilateres, with colors using 3 components plus an alpha channel.
+- Find the blocky shape in the picture and stop exploring them once they match the reference overall color (no improvement by adding a 5\*5px cyan stroke in a 50\*50px cyan area)
 
-We'll use once again the mean squared error approach to minimize the difference between the reference image and the generated images.
+#### Color
+
+**Values** are overally well balanced, **hues** are generally quite close to the target, but the generated images lack **saturation**, compared to the reference images, and are more greyish than the target.
+
+The lack of saturation is certainly due to the fact that the strokes use the **alpha channel** with a random value between 0 and 1.
+
+This means that the final color of a pixel results from the addition of the strokes colors covering that pixel,with respect to their alpha value.
+
+##### Possible improvements
+
+- After a step has been completed, make more intense use of **exploitation**, placing the shape randomly, but using the average color of the area it covers and tuning its hue/value/saturation instead of creating a completely new random color.
+
+### Technical results
+
+#### Execution time
+
+This is the main problem I've been facing : the algorithm is very slow.
+
+Currently it can only reproduce images under 200\*200px size in a reasonable amount of time (meaning between 20 minutes to one hour, depending on the meta data)
+
+Significative improvements have been met when precomputing the strokes as individual PNG files, and storing them in an array.
+
+Firstly the canvas API saved time avoiding to recompute the same strokes several time for each generation, secondly I was able to cache the individuals' fitnesses.
+
+##### Possible improvements
+
+- Using the *WebGL* context instead of *context2D* of the canvas API for all the methods involving drawing
+- Dynamically stop the evolution of a step after a threshold of low improvement between two generations is reached
+- Scale the individuals and population's sizes relatively to the strokes sizes
+- Using *worker_threads* or spawning child processes to evolve different parts of the image simultaneously and independently form each others
 
 ## Development
 
-Prerequesites:
+### Requirements
 
-- node
-- npm
+`node` and `npm` (used respectively v18.13.0 and 8.19.3)
 
-Scripts:
+### Scripts
 
-- ```npm run compile``` to compile from TypeScript to ES6
+`npm install` to install all the node modules locally.
 
-- ```npm run binaryRectangle``` to run the Binary Rectangle problem (solutions will be written to ```./src/BinaryRectangleApp/out``` folder)
+#### Compile
 
-- ```npm run binaryQuads``` to run the Binary Quads problem (solutions will be written to ```./src/BinaryQuadsApp/out``` folder)
+`npm run compile` to transpile the TypeScript code source. The transpiled code will be stored in the `dist` folder
+
+#### Run
+
+- Place a PNG file in the `output` folder and name it `ref.png`
+- Feel free to update the `app.config.json` parameters
+- `npm run geneticImage` to execute the program
+- Generated images for each step will be stored in the output folder, in the `results` subfolder
